@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo Spinner</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      padding: 30px;
+    }
+
+    .spinner-section {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .spinner-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin-bottom: 30px;
+    }
+
+    .spinner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      transition: transform 0.05s linear;
+      box-shadow: 0 0 0 8px #333, 0 0 0 12px #ffd700;
+    }
+
+    .spinner-pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 40px solid #ff4757;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .spinner-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background: #ffd700;
+      border-radius: 50%;
+      border: 4px solid #333;
+      z-index: 5;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .spin-button {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: white;
+      border: none;
+      padding: 18px 48px;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .spin-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+    }
+
+    .spin-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .result {
+      margin-top: 30px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #ff4757;
+      text-align: center;
+      min-height: 40px;
+    }
+
+    .word-list-section {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .word-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .word-list-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .clear-all-button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .clear-all-button:hover {
+      background: #c82333;
+    }
+
+    .clear-all-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .word-input-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .word-input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .word-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .add-button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .add-button:hover {
+      background: #5568d3;
+    }
+
+    .words-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    .word-item {
+      background: #f8f9fa;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+
+    .word-item:hover {
+      background: #e9ecef;
+    }
+
+    .word-text {
+      font-size: 16px;
+      color: #333;
+    }
+
+    .remove-button {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .remove-button:hover {
+      background: #ee5a6f;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .spinner-container {
+        width: 300px;
+        height: 300px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <div class="spinner-section">
+    <div class="title" id="title">
+     Bingo Spinner
+    </div>
+    <div class="spinner-container">
+     <div class="spinner-pointer"></div>
+     <canvas id="spinnerCanvas" width="400" height="400"></canvas>
+     <div class="spinner-center"></div>
+    </div><button class="spin-button" id="spinButton">ZAVRTI!</button>
+    <div class="result" id="result"></div>
+   </div>
+   <div class="word-list-section">
+    <div class="word-list-header">
+     <div class="word-list-title">
+      Seznam besed
+     </div><button class="clear-all-button" id="clearAllButton">Izbriši vse</button>
+    </div>
+    <div class="word-input-container"><input type="text" class="word-input" id="wordInput" placeholder="Vnesi besedo"> <button class="add-button" id="addButton">Dodaj</button>
+    </div>
+    <div class="words-container" id="wordsContainer"></div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      title_text: "BINGO",
+      result_prefix: "ZMAGOVALEC:"
+    };
+
+    let config = {};
+    let words = ["Jabolko", "Banana", "Češnja", "Datlja", "Bezeg", "Figa", "Grozdje", "Melona"];
+    let isSpinning = false;
+    let currentRotation = 0;
+    let spinningSound = null;
+
+    const canvas = document.getElementById('spinnerCanvas');
+    const ctx = canvas.getContext('2d');
+    const spinButton = document.getElementById('spinButton');
+    const wordInput = document.getElementById('wordInput');
+    const addButton = document.getElementById('addButton');
+    const clearAllButton = document.getElementById('clearAllButton');
+    const wordsContainer = document.getElementById('wordsContainer');
+    const resultDiv = document.getElementById('result');
+
+    function createSpinningSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Create a noise buffer for the clicking sound
+      const bufferSize = audioContext.sampleRate * 0.05;
+      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      // Generate a click sound (short burst of noise)
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.1));
+      }
+      
+      const gainNode = audioContext.createGain();
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.value = 0.3;
+      
+      return { audioContext, gainNode, buffer, sources: [] };
+    }
+
+    function drawSpinner() {
+      if (words.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f0f0f0';
+        ctx.beginPath();
+        ctx.arc(200, 200, 200, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#999';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Dodaj besede za vrtenje!', 200, 200);
+        return;
+      }
+
+      const centerX = 200;
+      const centerY = 200;
+      const radius = 200;
+      const sliceAngle = (Math.PI * 2) / words.length;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+
+      for (let i = 0; i < words.length; i++) {
+        const startAngle = i * sliceAngle + currentRotation;
+        const endAngle = (i + 1) * sliceAngle + currentRotation;
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText(words[i], radius * 0.65, 8);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (words.length === 0 || isSpinning) return;
+
+      // Remove the previously selected word if there was one
+      const resultText = resultDiv.textContent;
+      if (resultText) {
+        const prefix = config.result_prefix || defaultConfig.result_prefix;
+        const previousWinner = resultText.replace(prefix, '').trim();
+        const winnerIndex = words.findIndex(w => w.toUpperCase() === previousWinner);
+        if (winnerIndex !== -1) {
+          words.splice(winnerIndex, 1);
+          renderWordList();
+        }
+      }
+
+      if (words.length === 0) {
+        spinButton.disabled = true;
+        return;
+      }
+
+      isSpinning = true;
+      spinButton.disabled = true;
+      resultDiv.textContent = '';
+
+      drawSpinner();
+
+      spinningSound = createSpinningSound();
+
+      const spinDuration = 4000;
+      const spinRotations = 5 + Math.random() * 3;
+      const startRotation = currentRotation;
+      const totalRotation = spinRotations * Math.PI * 2;
+      const startTime = Date.now();
+      
+      let lastClickRotation = 0;
+      const sliceAngle = (Math.PI * 2) / words.length;
+
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / spinDuration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        currentRotation = startRotation + (easeOut * totalRotation);
+
+        // Play click sound when crossing a slice boundary
+        const rotationDiff = currentRotation - lastClickRotation;
+        if (rotationDiff >= sliceAngle) {
+          lastClickRotation = currentRotation;
+          
+          // Create and play a click sound
+          if (spinningSound) {
+            const source = spinningSound.audioContext.createBufferSource();
+            source.buffer = spinningSound.buffer;
+            source.connect(spinningSound.gainNode);
+            
+            // Adjust volume based on speed
+            spinningSound.gainNode.gain.value = 0.15 + (1 - easeOut) * 0.25;
+            
+            source.start();
+            spinningSound.sources.push(source);
+          }
+        }
+
+        drawSpinner();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          selectWinner();
+        }
+      }
+
+      animate();
+    }
+
+    function selectWinner() {
+      if (words.length === 0) {
+        isSpinning = false;
+        spinButton.disabled = true;
+        return;
+      }
+
+      const sliceAngle = (Math.PI * 2) / words.length;
+      const normalizedRotation = ((currentRotation % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+      
+      // Top of wheel is at 3π/2 (or -π/2), pointing upward
+      // We need to find which slice is at the top
+      const topAngle = (3 * Math.PI / 2);
+      let relativeAngle = (topAngle - normalizedRotation);
+      relativeAngle = ((relativeAngle % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+      
+      const selectedIndex = Math.floor(relativeAngle / sliceAngle) % words.length;
+
+      const eliminated = words[selectedIndex];
+      
+      // Check if we're down to the final 2 contestants
+      if (words.length === 2) {
+        // Remove the eliminated one
+        words.splice(selectedIndex, 1);
+        renderWordList();
+        
+        // The remaining one is the ultimate winner
+        const finalWinner = words[0];
+        
+        // Show eliminated message first
+        const prefix = config.result_prefix || defaultConfig.result_prefix;
+        resultDiv.textContent = `${prefix} ${eliminated.toUpperCase()}`;
+        resultDiv.style.fontSize = '28px';
+        resultDiv.style.color = '#ff4757';
+        resultDiv.style.textShadow = 'none';
+        
+        // After a short delay, show the final winner with fireworks
+        setTimeout(() => {
+          resultDiv.textContent = `KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()}`;
+          resultDiv.style.fontSize = '32px';
+          resultDiv.style.color = '#ffd700';
+          resultDiv.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.8)';
+          launchFireworks();
+          
+          // Clear the final winner from the list
+          words = [];
+          renderWordList();
+          drawSpinner();
+          spinButton.disabled = true;
+        }, 2000);
+      } else {
+        const prefix = config.result_prefix || defaultConfig.result_prefix;
+        resultDiv.textContent = `${prefix} ${eliminated.toUpperCase()}`;
+        resultDiv.style.fontSize = '28px';
+        resultDiv.style.color = '#ff4757';
+        resultDiv.style.textShadow = 'none';
+      }
+
+      isSpinning = false;
+      spinButton.disabled = false;
+    }
+
+    function launchFireworks() {
+      const fireworksContainer = document.createElement('div');
+      fireworksContainer.style.position = 'fixed';
+      fireworksContainer.style.top = '0';
+      fireworksContainer.style.left = '0';
+      fireworksContainer.style.width = '100%';
+      fireworksContainer.style.height = '100%';
+      fireworksContainer.style.pointerEvents = 'none';
+      fireworksContainer.style.zIndex = '1000';
+      document.body.appendChild(fireworksContainer);
+
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#ffa07a', '#f7dc6f', '#bb8fce', '#85c1e2'];
+      
+      // Launch multiple fireworks
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          createFirework(fireworksContainer, colors);
+        }, i * 200);
+      }
+
+      // Remove container after animations complete
+      setTimeout(() => {
+        document.body.removeChild(fireworksContainer);
+      }, 4000);
+    }
+
+    function createFirework(container, colors) {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * (window.innerHeight * 0.6) + window.innerHeight * 0.1;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Create particles
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'absolute';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.width = '8px';
+        particle.style.height = '8px';
+        particle.style.borderRadius = '50%';
+        particle.style.backgroundColor = color;
+        particle.style.boxShadow = `0 0 10px ${color}`;
+        
+        const angle = (Math.PI * 2 * i) / 30;
+        const velocity = 100 + Math.random() * 100;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+        
+        container.appendChild(particle);
+        
+        let px = x;
+        let py = y;
+        let life = 1;
+        const startTime = Date.now();
+        
+        function animateParticle() {
+          const elapsed = (Date.now() - startTime) / 1000;
+          life = Math.max(0, 1 - elapsed / 1.5);
+          
+          if (life > 0) {
+            px += vx * 0.016;
+            py += vy * 0.016 + 100 * elapsed;
+            
+            particle.style.left = px + 'px';
+            particle.style.top = py + 'px';
+            particle.style.opacity = life;
+            particle.style.transform = `scale(${life})`;
+            
+            requestAnimationFrame(animateParticle);
+          } else {
+            container.removeChild(particle);
+          }
+        }
+        
+        animateParticle();
+      }
+    }
+
+    function addWord() {
+      const input = wordInput.value.trim();
+      if (input) {
+        // Split by spaces and filter out empty strings
+        const newWords = input.split(/\s+/).filter(w => w.length > 0);
+        
+        // Add words up to the limit of 20
+        newWords.forEach(word => {
+          if (words.length < 20) {
+            words.push(word);
+          }
+        });
+        
+        wordInput.value = '';
+        renderWordList();
+        drawSpinner();
+        spinButton.disabled = false;
+        updateClearAllButton();
+      }
+    }
+
+    function removeWord(index) {
+      words.splice(index, 1);
+      renderWordList();
+      drawSpinner();
+      spinButton.disabled = words.length === 0 || isSpinning;
+      updateClearAllButton();
+    }
+
+    function clearAllWords() {
+      words = [];
+      resultDiv.textContent = '';
+      renderWordList();
+      drawSpinner();
+      spinButton.disabled = true;
+      updateClearAllButton();
+    }
+
+    function updateClearAllButton() {
+      clearAllButton.disabled = words.length === 0;
+    }
+
+    function renderWordList() {
+      wordsContainer.innerHTML = '';
+      words.forEach((word, index) => {
+        const wordItem = document.createElement('div');
+        wordItem.className = 'word-item';
+        
+        const wordText = document.createElement('span');
+        wordText.className = 'word-text';
+        wordText.textContent = word;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-button';
+        removeBtn.textContent = 'Odstrani';
+        removeBtn.onclick = () => removeWord(index);
+        
+        wordItem.appendChild(wordText);
+        wordItem.appendChild(removeBtn);
+        wordsContainer.appendChild(wordItem);
+      });
+    }
+
+    async function onConfigChange(newConfig) {
+      config = newConfig;
+      const titleElement = document.getElementById('title');
+      titleElement.textContent = config.title_text || defaultConfig.title_text;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["title_text", config.title_text || defaultConfig.title_text],
+        ["result_prefix", config.result_prefix || defaultConfig.result_prefix]
+      ]);
+    }
+
+    spinButton.addEventListener('click', spinWheel);
+    addButton.addEventListener('click', addWord);
+    clearAllButton.addEventListener('click', clearAllWords);
+    wordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addWord();
+    });
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+      config = window.elementSdk.config;
+    }
+
+    renderWordList();
+    drawSpinner();
+    updateClearAllButton();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a1a2772c1ddb36b',t:'MTc2MzY2NDg0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
