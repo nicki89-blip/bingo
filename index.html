@@ -25,9 +25,9 @@
 
     .container {
       width: 95%;
-      max-width: 1400px;
+      max-width: 1600px;
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr;
       gap: 30px;
       padding: 30px;
       animation: fadeIn 0.6s ease-out;
@@ -378,10 +378,202 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
+    .eliminated-section {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      max-height: 800px;
+    }
+
+    .eliminated-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .eliminated-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .eliminated-count {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .clear-eliminated-button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clear-eliminated-button:hover:not(:disabled) {
+      background: #6d28d9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .clear-eliminated-button:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    .eliminated-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 680px;
+      padding-right: 8px;
+    }
+
+    .eliminated-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .eliminated-container::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 10px;
+    }
+
+    .eliminated-container::-webkit-scrollbar-thumb {
+      background: #9ca3af;
+      border-radius: 10px;
+    }
+
+    .eliminated-container::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+
+    .eliminated-item {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      border: 1px solid #fbbf24;
+      animation: slideIn 0.3s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .eliminated-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .eliminated-item:hover {
+      background: linear-gradient(135deg, #fef9c3 0%, #fef3c7 100%);
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+    }
+
+    .eliminated-text {
+      font-size: 16px;
+      color: #78350f;
+      font-weight: 600;
+      padding-left: 12px;
+    }
+
+    .eliminated-order {
+      background: #f59e0b;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .final-winner-item {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border: 2px solid #10b981;
+      position: relative;
+    }
+
+    .final-winner-item::before {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    }
+
+    .final-winner-item .eliminated-text {
+      color: #064e3b;
+    }
+
+    .final-winner-item .eliminated-order {
+      background: #10b981;
+    }
+
+    .winner-badge {
+      background: #10b981;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .empty-eliminated {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .empty-eliminated-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 1400px) {
+      .eliminated-section {
+        display: none;
+      }
+      .show-eliminated-mobile {
+        display: block;
+        margin-top: 20px;
+      }
+    }
+
+    @media (max-width: 1400px) {
+      .container {
+        grid-template-columns: 2fr 1fr;
+      }
+      .eliminated-section {
+        display: none;
+      }
+    }
+
     @media (max-width: 1200px) {
       .container {
         grid-template-columns: 1fr;
         gap: 20px;
+      }
+      .eliminated-section {
+        display: flex;
       }
       .spinner-container {
         width: 450px;
@@ -437,6 +629,21 @@
       </div>
       <div class="words-container" id="wordsContainer"></div>
     </div>
+    <div class="eliminated-section">
+      <div class="eliminated-header">
+        <div>
+          <div class="eliminated-title">Odstranjeni</div>
+          <div class="eliminated-count" id="eliminatedCount">0 odstranjenih</div>
+        </div>
+        <button class="clear-eliminated-button" id="clearEliminatedButton">Počisti</button>
+      </div>
+      <div class="eliminated-container" id="eliminatedContainer">
+        <div class="empty-eliminated">
+          <div class="empty-eliminated-icon">🎯</div>
+          <div>Odstranjeni elementi se bodo prikazali tukaj</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -452,7 +659,8 @@
     // State
     const state = {
       config: {},
-      words: ["Jabolko", "Banana", "Češnja", "Datlja", "Bezeg", "Figa", "Grozdje", "Melona"],
+      words: ["Jabolko", "Banana", "Češnja", "Datlji", "Bezeg", "Figa", "Grozdje", "Melona"],
+      eliminatedWords: [],
       isSpinning: false,
       currentRotation: 0,
       soundEnabled: true,
@@ -484,7 +692,10 @@
       resultDiv: document.getElementById('result'),
       wordCountDiv: document.getElementById('wordCount'),
       soundToggle: document.getElementById('soundToggle'),
-      title: document.getElementById('title')
+      title: document.getElementById('title'),
+      eliminatedContainer: document.getElementById('eliminatedContainer'),
+      eliminatedCountDiv: document.getElementById('eliminatedCount'),
+      clearEliminatedButton: document.getElementById('clearEliminatedButton')
     };
 
     // ============================================================================
@@ -723,12 +934,19 @@
       if (!resultText) return;
       
       const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
-      const previousWinner = resultText.replace(prefix, '').trim();
+      const previousWinner = resultText.replace(prefix, '').replace('🎉', '').replace('KONČNI ZMAGOVALEC:', '').trim();
       const winnerIndex = state.words.findIndex(w => w.toUpperCase() === previousWinner);
       
       if (winnerIndex !== -1) {
+        const eliminatedWord = state.words[winnerIndex];
+        state.eliminatedWords.push({
+          word: eliminatedWord,
+          order: state.eliminatedWords.length + 1,
+          isFinalWinner: false
+        });
         state.words.splice(winnerIndex, 1);
         renderWordList();
+        renderEliminatedList();
         updateWordCount();
       }
     }
@@ -760,8 +978,16 @@
     }
 
     function handleFinalWinner(selectedIndex, eliminated) {
+      // Add eliminated to list first
+      state.eliminatedWords.push({
+        word: eliminated,
+        order: state.eliminatedWords.length + 1,
+        isFinalWinner: false
+      });
+      
       state.words.splice(selectedIndex, 1);
       renderWordList();
+      renderEliminatedList();
       updateWordCount();
       
       const finalWinner = state.words[0];
@@ -780,11 +1006,19 @@
         elements.resultDiv.style.color = '#fbbf24';
         elements.resultDiv.style.textShadow = '0 0 20px rgba(251, 191, 36, 0.8)';
         
+        // Add final winner to eliminated list with special flag
+        state.eliminatedWords.push({
+          word: finalWinner,
+          order: state.eliminatedWords.length + 1,
+          isFinalWinner: true
+        });
+        
         audioSystem.playVictorySound();
         launchFireworks();
         
         state.words = [];
         renderWordList();
+        renderEliminatedList();
         updateWordCount();
         drawSpinner();
         elements.spinButton.disabled = true;
@@ -917,12 +1151,65 @@
 
     function clearAllWords() {
       state.words = [];
+      state.eliminatedWords = [];
       elements.resultDiv.textContent = '';
       renderWordList();
+      renderEliminatedList();
       drawSpinner();
       elements.spinButton.disabled = true;
       updateClearAllButton();
       updateWordCount();
+    }
+
+    function clearEliminatedWords() {
+      state.eliminatedWords = [];
+      renderEliminatedList();
+    }
+
+    function renderEliminatedList() {
+      elements.eliminatedContainer.innerHTML = '';
+      
+      if (state.eliminatedWords.length === 0) {
+        elements.eliminatedContainer.innerHTML = `
+          <div class="empty-eliminated">
+            <div class="empty-eliminated-icon">🎯</div>
+            <div>Odstranjeni elementi se bodo prikazali tukaj</div>
+          </div>
+        `;
+        elements.clearEliminatedButton.disabled = true;
+        elements.eliminatedCountDiv.textContent = '0 odstranjenih';
+        return;
+      }
+      
+      elements.clearEliminatedButton.disabled = false;
+      elements.eliminatedCountDiv.textContent = `${state.eliminatedWords.length} odstranjenih`;
+      
+      // Reverse the array to show newest first
+      const reversedWords = [...state.eliminatedWords].reverse();
+      
+      reversedWords.forEach((item, index) => {
+        const eliminatedItem = document.createElement('div');
+        eliminatedItem.className = item.isFinalWinner ? 'eliminated-item final-winner-item' : 'eliminated-item';
+        
+        const eliminatedText = document.createElement('span');
+        eliminatedText.className = 'eliminated-text';
+        eliminatedText.textContent = item.word;
+        
+        if (item.isFinalWinner) {
+          const winnerBadge = document.createElement('span');
+          winnerBadge.className = 'winner-badge';
+          winnerBadge.textContent = '👑 ZMAGOVALEC';
+          eliminatedText.appendChild(winnerBadge);
+        }
+        
+        const orderBadge = document.createElement('span');
+        orderBadge.className = 'eliminated-order';
+        orderBadge.textContent = `#${item.order}`;
+        
+        eliminatedItem.appendChild(eliminatedText);
+        eliminatedItem.appendChild(orderBadge);
+        elements.eliminatedContainer.appendChild(eliminatedItem);
+      });
     }
 
     function renderWordList() {
@@ -997,6 +1284,7 @@
     elements.spinButton.addEventListener('click', spinWheel);
     elements.addButton.addEventListener('click', addWord);
     elements.clearAllButton.addEventListener('click', clearAllWords);
+    elements.clearEliminatedButton.addEventListener('click', clearEliminatedWords);
     elements.soundToggle.addEventListener('click', () => audioSystem.toggleSound());
     elements.wordInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') addWord();
@@ -1015,6 +1303,7 @@
 
     // Initial render
     renderWordList();
+    renderEliminatedList();
     drawSpinner();
     updateClearAllButton();
     updateWordCount();
