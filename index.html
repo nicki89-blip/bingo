@@ -25,10 +25,10 @@
 
     .container {
       width: 95%;
-      max-width: 1600px;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 30px;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
       padding: 30px;
       animation: fadeIn 0.6s ease-out;
     }
@@ -41,7 +41,7 @@
     .spinner-section {
       background: rgba(255, 255, 255, 0.98);
       border-radius: 24px;
-      padding: 50px 40px;
+      padding: 40px 30px 30px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
@@ -83,9 +83,9 @@
 
     .spinner-container {
       position: relative;
-      width: 550px;
-      height: 550px;
-      margin-bottom: 40px;
+      width: 420px;
+      height: 420px;
+      margin-bottom: 30px;
       z-index: 1;
     }
 
@@ -176,27 +176,111 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    .word-list-section {
+    .tabs-section {
       background: rgba(255, 255, 255, 0.98);
       border-radius: 24px;
-      padding: 30px;
+      padding: 0;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
-      max-height: 800px;
+      max-height: 520px;
+      overflow: hidden;
+    }
+
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      background: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-button:first-child {
+      border-radius: 24px 0 0 0;
+    }
+
+    .tab-button:last-child {
+      border-radius: 0 24px 0 0;
+    }
+
+    .tab-button.active {
+      color: #7e22ce;
+      background: white;
+    }
+
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #7e22ce, #5b21b6);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .tab-button:hover:not(.active) {
+      color: #374151;
+      background: #f3f4f6;
+    }
+
+    .tab-badge {
+      display: inline-block;
+      background: #e5e7eb;
+      color: #6b7280;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+    }
+
+    .tab-button.active .tab-badge {
+      background: #ede9fe;
+      color: #7e22ce;
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 20px 24px 24px;
+      flex: 1;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    .word-list-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .word-list-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #e5e7eb;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .word-list-title {
-      font-size: 24px;
+      font-size: 16px;
       font-weight: 700;
       color: #1f2937;
     }
@@ -285,7 +369,6 @@
     .words-container {
       flex: 1;
       overflow-y: auto;
-      max-height: 500px;
       padding-right: 8px;
     }
 
@@ -379,22 +462,17 @@
     }
 
     .eliminated-section {
-      background: rgba(255, 255, 255, 0.98);
-      border-radius: 24px;
-      padding: 30px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      flex: 1;
       display: flex;
       flex-direction: column;
-      max-height: 800px;
+      overflow: hidden;
     }
 
     .eliminated-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #e5e7eb;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .eliminated-title {
@@ -436,7 +514,6 @@
     .eliminated-container {
       flex: 1;
       overflow-y: auto;
-      max-height: 680px;
       padding-right: 8px;
     }
 
@@ -548,46 +625,274 @@
       opacity: 0.5;
     }
 
-    @media (max-width: 1400px) {
-      .eliminated-section {
-        display: none;
-      }
-      .show-eliminated-mobile {
-        display: block;
-        margin-top: 20px;
-      }
+    /* Fullscreen button in normal view */
+    .fullscreen-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #e5e7eb;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      font-size: 22px;
     }
 
-    @media (max-width: 1400px) {
-      .container {
-        grid-template-columns: 2fr 1fr;
-      }
-      .eliminated-section {
-        display: none;
-      }
+    .fullscreen-button:hover {
+      background: white;
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    @media (max-width: 1200px) {
-      .container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-      .eliminated-section {
-        display: flex;
-      }
-      .spinner-container {
-        width: 450px;
-        height: 450px;
-      }
+    /* Fullscreen overlay */
+    .fs-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .fs-overlay.active {
+      display: flex;
+    }
+
+    .fs-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      position: relative;
+    }
+
+    .fs-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 56px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .fs-spinner-container {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .fs-spinner-container .spinner-pointer {
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-top: 45px solid #dc2626;
+      z-index: 10;
+      filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.5));
+      animation: pointerBounce 2s ease-in-out infinite;
+    }
+
+    .fs-spinner-container .spinner-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      border-radius: 50%;
+      border: 5px solid #1f2937;
+      z-index: 5;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .fs-result {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fbbf24;
+      text-align: center;
+      min-height: 44px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .fs-spin-button {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color: white;
+      border: none;
+      padding: 18px 56px;
+      font-size: 28px;
+      font-weight: 700;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: 'Bebas Neue', cursive;
+      margin-bottom: 16px;
+    }
+
+    .fs-spin-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(220, 38, 38, 0.5);
+    }
+
+    .fs-spin-button:disabled {
+      background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .fs-close {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .fs-close:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.1);
+    }
+
+    .fs-sound-toggle {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 22px;
+      transition: all 0.3s ease;
+    }
+
+    .fs-sound-toggle:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.1);
+    }
+
+    /* Right sidebar with eliminated items */
+    .fs-sidebar {
+      width: 280px;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-left: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .fs-sidebar-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .fs-eliminated-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .fs-eliminated-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      animation: fsSlideIn 0.4s ease-out;
+    }
+
+    @keyframes fsSlideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .fs-eliminated-item .fs-order {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      min-width: 24px;
+    }
+
+    .fs-eliminated-item .fs-word {
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      text-decoration: line-through;
+      text-decoration-color: rgba(255,255,255,0.3);
+    }
+
+    .fs-eliminated-item.fs-winner {
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .fs-eliminated-item.fs-winner .fs-word {
+      color: #6ee7b7;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .fs-eliminated-item.fs-winner .fs-order {
+      color: #6ee7b7;
+    }
+
+    .fs-empty {
+      color: rgba(255,255,255,0.25);
+      font-size: 13px;
+      text-align: center;
+      padding: 30px 10px;
     }
 
     @media (max-width: 600px) {
       .container {
-        padding: 20px;
+        padding: 16px;
+        gap: 16px;
       }
       .spinner-container {
-        width: 350px;
-        height: 350px;
+        width: 300px;
+        height: 300px;
       }
       .title {
         font-size: 36px;
@@ -595,6 +900,10 @@
       .spin-button {
         padding: 16px 40px;
         font-size: 22px;
+      }
+      .fs-sidebar {
+        width: 180px;
+        padding: 16px 10px;
       }
     }
   </style>
@@ -605,43 +914,70 @@
 <body>
   <div class="container">
     <div class="spinner-section">
+      <button class="fullscreen-button" id="fullscreenButton" title="Celozaslonski način">⛶</button>
       <button class="sound-toggle" id="soundToggle" title="Toggle sound">🔊</button>
       <div class="title" id="title">Bingo Spinner</div>
       <div class="spinner-container">
         <div class="spinner-pointer"></div>
-        <canvas id="spinnerCanvas" width="550" height="550"></canvas>
+        <canvas id="spinnerCanvas" width="420" height="420"></canvas>
         <div class="spinner-center"></div>
       </div>
       <button class="spin-button" id="spinButton">Zavrti!</button>
       <div class="result" id="result"></div>
     </div>
-    <div class="word-list-section">
-      <div class="word-list-header">
-        <div>
-          <div class="word-list-title">Seznam besed</div>
-          <div class="word-count" id="wordCount">0 / 50 besed</div>
+    <div class="tabs-section">
+      <div class="tab-bar">
+        <button class="tab-button active" data-tab="words" id="tabWords">Besede <span class="tab-badge" id="tabWordsBadge">0</span></button>
+        <button class="tab-button" data-tab="eliminated" id="tabEliminated">Odstranjeni <span class="tab-badge" id="tabEliminatedBadge">0</span></button>
+      </div>
+      <div class="tab-panel active" id="panelWords">
+        <div class="word-list-section">
+          <div class="word-list-header">
+            <div class="word-count" id="wordCount">0 / 50 besed</div>
+            <button class="clear-all-button" id="clearAllButton">Izbriši vse</button>
+          </div>
+          <div class="word-input-container">
+            <input type="text" class="word-input" id="wordInput" placeholder="Vnesi besedo">
+            <button class="add-button" id="addButton">Dodaj</button>
+          </div>
+          <div class="words-container" id="wordsContainer"></div>
         </div>
-        <button class="clear-all-button" id="clearAllButton">Izbriši vse</button>
       </div>
-      <div class="word-input-container">
-        <input type="text" class="word-input" id="wordInput" placeholder="Vnesi besedo">
-        <button class="add-button" id="addButton">Dodaj</button>
+      <div class="tab-panel" id="panelEliminated">
+        <div class="eliminated-section">
+          <div class="eliminated-header">
+            <div class="eliminated-count" id="eliminatedCount">0 odstranjenih</div>
+            <button class="clear-eliminated-button" id="clearEliminatedButton">Počisti</button>
+          </div>
+          <div class="eliminated-container" id="eliminatedContainer">
+            <div class="empty-eliminated">
+              <div class="empty-eliminated-icon">🎯</div>
+              <div>Odstranjeni elementi se bodo prikazali tukaj</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="words-container" id="wordsContainer"></div>
     </div>
-    <div class="eliminated-section">
-      <div class="eliminated-header">
-        <div>
-          <div class="eliminated-title">Odstranjeni</div>
-          <div class="eliminated-count" id="eliminatedCount">0 odstranjenih</div>
-        </div>
-        <button class="clear-eliminated-button" id="clearEliminatedButton">Počisti</button>
+  </div>
+
+  <!-- Fullscreen overlay -->
+  <div class="fs-overlay" id="fsOverlay">
+    <div class="fs-main">
+      <button class="fs-close" id="fsClose" title="Zapri">✕</button>
+      <button class="fs-sound-toggle" id="fsSoundToggle">🔊</button>
+      <div class="fs-title" id="fsTitle">BINGO</div>
+      <div class="fs-spinner-container" id="fsSpinnerContainer">
+        <div class="spinner-pointer"></div>
+        <canvas id="fsCanvas"></canvas>
+        <div class="spinner-center"></div>
       </div>
-      <div class="eliminated-container" id="eliminatedContainer">
-        <div class="empty-eliminated">
-          <div class="empty-eliminated-icon">🎯</div>
-          <div>Odstranjeni elementi se bodo prikazali tukaj</div>
-        </div>
+      <button class="fs-spin-button" id="fsSpinButton">Zavrti!</button>
+      <div class="fs-result" id="fsResult"></div>
+    </div>
+    <div class="fs-sidebar">
+      <div class="fs-sidebar-title">Odstranjeni</div>
+      <div class="fs-eliminated-list" id="fsEliminatedList">
+        <div class="fs-empty">Zavrti kolo za začetek</div>
       </div>
     </div>
   </div>
@@ -669,7 +1005,7 @@
 
     // Constants
     const MAX_WORDS = 50;
-    const CANVAS_SIZE = 550;
+    const CANVAS_SIZE = 420;
     const CANVAS_CENTER = CANVAS_SIZE / 2;
     const SPINNER_RADIUS = CANVAS_CENTER;
     const SPIN_DURATION = 4000;
@@ -896,10 +1232,16 @@
       audioSystem.init();
       
       const startRotation = state.currentRotation;
-      const totalRotation = (BASE_ROTATIONS + Math.random() * 3) * Math.PI * 2;
-      const startTime = Date.now();
       const sliceAngle = (Math.PI * 2) / state.words.length;
-      
+
+      // Pick a truly random winner, then compute rotation to land on that slice
+      const randomIndex = Math.floor(Math.random() * state.words.length);
+      const targetAngle = (3 * Math.PI / 2) - (randomIndex * sliceAngle + sliceAngle * (0.15 + Math.random() * 0.7));
+      const normalizedStart = startRotation % (Math.PI * 2);
+      const baseSpins = (BASE_ROTATIONS + 2 + Math.random() * 3) * Math.PI * 2;
+      const totalRotation = baseSpins + ((targetAngle - normalizedStart) % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
+
+      const startTime = Date.now();
       let lastClickRotation = 0;
       
       function animate() {
@@ -948,6 +1290,7 @@
         renderWordList();
         renderEliminatedList();
         updateWordCount();
+        updateTabBadges();
       }
     }
 
@@ -989,7 +1332,8 @@
       renderWordList();
       renderEliminatedList();
       updateWordCount();
-      
+      updateTabBadges();
+
       const finalWinner = state.words[0];
       const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
       
@@ -1020,6 +1364,7 @@
         renderWordList();
         renderEliminatedList();
         updateWordCount();
+        updateTabBadges();
         drawSpinner();
         elements.spinButton.disabled = true;
       }, 2000);
@@ -1138,6 +1483,7 @@
       elements.spinButton.disabled = false;
       updateClearAllButton();
       updateWordCount();
+      updateTabBadges();
     }
 
     function removeWord(index) {
@@ -1147,6 +1493,7 @@
       elements.spinButton.disabled = state.words.length === 0 || state.isSpinning;
       updateClearAllButton();
       updateWordCount();
+      updateTabBadges();
     }
 
     function clearAllWords() {
@@ -1159,11 +1506,13 @@
       elements.spinButton.disabled = true;
       updateClearAllButton();
       updateWordCount();
+      updateTabBadges();
     }
 
     function clearEliminatedWords() {
       state.eliminatedWords = [];
       renderEliminatedList();
+      updateTabBadges();
     }
 
     function renderEliminatedList() {
@@ -1280,6 +1629,23 @@
       ]);
     }
 
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.getElementById(tabName === 'words' ? 'panelWords' : 'panelEliminated').classList.add('active');
+    }
+
+    function updateTabBadges() {
+      document.getElementById('tabWordsBadge').textContent = state.words.length;
+      document.getElementById('tabEliminatedBadge').textContent = state.eliminatedWords.length;
+    }
+
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
     // Event Listeners
     elements.spinButton.addEventListener('click', spinWheel);
     elements.addButton.addEventListener('click', addWord);
@@ -1307,6 +1673,295 @@
     drawSpinner();
     updateClearAllButton();
     updateWordCount();
+    updateTabBadges();
+
+    // ============================================================================
+    // Fullscreen Mode
+    // ============================================================================
+
+    const fs = {
+      overlay: document.getElementById('fsOverlay'),
+      canvas: document.getElementById('fsCanvas'),
+      ctx: null,
+      spinButton: document.getElementById('fsSpinButton'),
+      result: document.getElementById('fsResult'),
+      eliminatedList: document.getElementById('fsEliminatedList'),
+      title: document.getElementById('fsTitle'),
+      active: false,
+      canvasSize: 500
+    };
+
+    function openFullscreen() {
+      fs.active = true;
+      fs.overlay.classList.add('active');
+
+      // Size the canvas to fit the viewport
+      const vh = window.innerHeight;
+      const availableH = vh - 260; // title + button + result + padding
+      fs.canvasSize = Math.min(availableH, window.innerWidth - 340, 600);
+      fs.canvasSize = Math.max(fs.canvasSize, 280);
+
+      fs.canvas.width = fs.canvasSize;
+      fs.canvas.height = fs.canvasSize;
+      fs.canvas.style.width = fs.canvasSize + 'px';
+      fs.canvas.style.height = fs.canvasSize + 'px';
+
+      const container = document.getElementById('fsSpinnerContainer');
+      container.style.width = fs.canvasSize + 'px';
+      container.style.height = fs.canvasSize + 'px';
+
+      fs.ctx = fs.canvas.getContext('2d');
+      fs.title.textContent = elements.title.textContent || 'BINGO';
+
+      fs.spinButton.disabled = state.words.length === 0 || state.isSpinning;
+      fs.result.textContent = elements.resultDiv.textContent;
+
+      drawFsSpinner();
+      renderFsEliminated();
+      updateFsSoundButton();
+    }
+
+    function closeFullscreen() {
+      fs.active = false;
+      fs.overlay.classList.remove('active');
+      // Sync back to normal view
+      drawSpinner();
+      renderWordList();
+      renderEliminatedList();
+      updateWordCount();
+      updateTabBadges();
+      updateClearAllButton();
+    }
+
+    function drawFsSpinner() {
+      if (!fs.active || !fs.ctx) return;
+      const ctx = fs.ctx;
+      const size = fs.canvasSize;
+      const center = size / 2;
+      const radius = center;
+      const { words, currentRotation } = state;
+
+      ctx.clearRect(0, 0, size, size);
+
+      if (words.length === 0) {
+        ctx.fillStyle = '#f3f4f6';
+        ctx.beginPath();
+        ctx.arc(center, center, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = 'bold 20px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText('Ni več besed!', center, center);
+        return;
+      }
+
+      const sliceAngle = (Math.PI * 2) / words.length;
+
+      for (let i = 0; i < words.length; i++) {
+        const startAngle = i * sliceAngle + currentRotation;
+        const endAngle = (i + 1) * sliceAngle + currentRotation;
+
+        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Text
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.lineWidth = 3;
+
+        let fontSize = 18;
+        if (words.length > 20) fontSize = 14;
+        else if (words.length > 12) fontSize = 16;
+        if (words[i].length > 10) fontSize = Math.max(10, fontSize - 2);
+        ctx.font = `bold ${fontSize}px Poppins`;
+
+        const maxWidth = radius * 0.45;
+        const text = words[i];
+
+        if (ctx.measureText(text).width > maxWidth && text.length > 8) {
+          const mid = Math.floor(text.length / 2);
+          ctx.strokeText(text.substring(0, mid), radius * 0.65, -2);
+          ctx.fillText(text.substring(0, mid), radius * 0.65, -2);
+          ctx.strokeText(text.substring(mid), radius * 0.65, fontSize + 2);
+          ctx.fillText(text.substring(mid), radius * 0.65, fontSize + 2);
+        } else {
+          ctx.strokeText(text, radius * 0.65, 6);
+          ctx.fillText(text, radius * 0.65, 6);
+        }
+        ctx.restore();
+      }
+    }
+
+    function renderFsEliminated() {
+      if (!fs.active) return;
+      fs.eliminatedList.innerHTML = '';
+
+      if (state.eliminatedWords.length === 0) {
+        fs.eliminatedList.innerHTML = '<div class="fs-empty">Zavrti kolo za začetek</div>';
+        return;
+      }
+
+      // Show newest first
+      const reversed = [...state.eliminatedWords].reverse();
+      reversed.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'fs-eliminated-item' + (item.isFinalWinner ? ' fs-winner' : '');
+        el.innerHTML = `<span class="fs-order">#${item.order}</span><span class="fs-word">${item.word}${item.isFinalWinner ? ' 👑' : ''}</span>`;
+        fs.eliminatedList.appendChild(el);
+      });
+    }
+
+    function fsSyncAll() {
+      renderFsEliminated();
+      renderWordList();
+      renderEliminatedList();
+      updateWordCount();
+      updateTabBadges();
+      updateClearAllButton();
+      drawFsSpinner();
+      drawSpinner();
+    }
+
+    function fsSpinWheel() {
+      if (state.words.length === 0 || state.isSpinning) return;
+
+      state.isSpinning = true;
+      fs.spinButton.disabled = true;
+      elements.spinButton.disabled = true;
+      fs.result.textContent = '';
+      elements.resultDiv.textContent = '';
+
+      audioSystem.init();
+      drawFsSpinner();
+
+      const startRotation = state.currentRotation;
+      const sliceAngle = (Math.PI * 2) / state.words.length;
+
+      // Pick a truly random winner, then compute rotation to land on that slice
+      const randomIndex = Math.floor(Math.random() * state.words.length);
+      const targetAngle = (3 * Math.PI / 2) - (randomIndex * sliceAngle + sliceAngle * (0.15 + Math.random() * 0.7));
+      const normalizedStart = startRotation % (Math.PI * 2);
+      const baseSpins = (BASE_ROTATIONS + 2 + Math.random() * 3) * Math.PI * 2;
+      const totalRotation = baseSpins + ((targetAngle - normalizedStart) % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
+
+      const startTime = Date.now();
+      let lastClickRotation = 0;
+
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / SPIN_DURATION, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        state.currentRotation = startRotation + (easeOut * totalRotation);
+
+        const rotationDiff = state.currentRotation - lastClickRotation;
+        if (rotationDiff >= sliceAngle) {
+          lastClickRotation = state.currentRotation;
+          audioSystem.playTick(1 - easeOut);
+        }
+
+        drawFsSpinner();
+        drawSpinner();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          fsSelectWinner();
+        }
+      }
+
+      animate();
+    }
+
+    function fsSelectWinner() {
+      if (state.words.length === 0) {
+        state.isSpinning = false;
+        fs.spinButton.disabled = true;
+        return;
+      }
+
+      const sliceAngle = (Math.PI * 2) / state.words.length;
+      const normalizedRotation = ((state.currentRotation % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+      const topAngle = (3 * Math.PI / 2);
+      let relativeAngle = ((topAngle - normalizedRotation) % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
+      const selectedIndex = Math.floor(relativeAngle / sliceAngle) % state.words.length;
+      const eliminated = state.words[selectedIndex];
+      const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
+
+      // Immediately eliminate the selected word
+      state.eliminatedWords.push({ word: eliminated, order: state.eliminatedWords.length + 1, isFinalWinner: false });
+      state.words.splice(selectedIndex, 1);
+
+      fs.result.textContent = `${prefix} ${eliminated.toUpperCase()}`;
+      elements.resultDiv.textContent = '';  // Clear normal view so deferred elimination doesn't double-remove
+
+      fsSyncAll();
+
+      if (state.words.length === 1) {
+        // Crown the final winner
+        const finalWinner = state.words[0];
+        fs.spinButton.disabled = true;
+
+        setTimeout(() => {
+          state.eliminatedWords.push({ word: finalWinner, order: state.eliminatedWords.length + 1, isFinalWinner: true });
+          state.words = [];
+
+          fs.result.textContent = `🎉 KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()} 🎉`;
+          elements.resultDiv.textContent = '';
+
+          audioSystem.playVictorySound();
+          launchFireworks();
+
+          fsSyncAll();
+          fs.spinButton.disabled = true;
+          elements.spinButton.disabled = true;
+        }, 2000);
+
+        state.isSpinning = false;
+        return;
+      }
+
+      state.isSpinning = false;
+      fs.spinButton.disabled = state.words.length === 0;
+      elements.spinButton.disabled = state.words.length === 0;
+    }
+
+    function updateFsSoundButton() {
+      document.getElementById('fsSoundToggle').textContent = state.soundEnabled ? '🔊' : '🔇';
+    }
+
+    // Fullscreen event listeners
+    document.getElementById('fullscreenButton').addEventListener('click', openFullscreen);
+    document.getElementById('fsClose').addEventListener('click', closeFullscreen);
+    document.getElementById('fsSoundToggle').addEventListener('click', () => {
+      audioSystem.toggleSound();
+      elements.soundToggle.textContent = state.soundEnabled ? '🔊' : '🔇';
+      updateFsSoundButton();
+    });
+    fs.spinButton.addEventListener('click', fsSpinWheel);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && fs.active) closeFullscreen();
+    });
+
+    window.addEventListener('resize', () => {
+      if (fs.active) openFullscreen();
+    });
   </script>
 </body>
 </html>
