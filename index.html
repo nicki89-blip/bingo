@@ -437,6 +437,180 @@
       transform: scale(1.05);
     }
 
+    /* Load Class Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .modal-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      color: #1f2937;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .modal-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
+    }
+
+    .modal-input:focus {
+      border-color: #7e22ce;
+      box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.1);
+    }
+
+    .modal-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      animation: shake 0.4s ease-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .modal-error {
+      color: #ef4444;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .modal-error.visible {
+      display: block;
+    }
+
+    .modal-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      background: white;
+      cursor: pointer;
+      display: none;
+    }
+
+    .modal-select:focus {
+      border-color: #7e22ce;
+      box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.1);
+    }
+
+    .modal-select.visible {
+      display: block;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn-cancel {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .modal-btn-cancel:hover {
+      background: #e5e7eb;
+    }
+
+    .modal-btn-confirm {
+      background: linear-gradient(135deg, #7e22ce 0%, #5b21b6 100%);
+      color: white;
+      display: none;
+    }
+
+    .modal-btn-confirm:hover {
+      background: linear-gradient(135deg, #6b21a8 0%, #4c1d95 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+    }
+
+    .modal-btn-confirm.visible {
+      display: inline-block;
+    }
+
+    .load-class-button {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .load-class-button:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
     .sound-toggle {
       position: absolute;
       top: 20px;
@@ -934,7 +1108,10 @@
         <div class="word-list-section">
           <div class="word-list-header">
             <div class="word-count" id="wordCount">0 / 50 besed</div>
-            <button class="clear-all-button" id="clearAllButton">Izbriši vse</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="load-class-button" id="loadClassButton">Naloži razred</button>
+              <button class="clear-all-button" id="clearAllButton">Izbriši vse</button>
+            </div>
           </div>
           <div class="word-input-container">
             <input type="text" class="word-input" id="wordInput" placeholder="Vnesi besedo">
@@ -956,6 +1133,25 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Class Modal -->
+  <div class="modal-overlay" id="classModal">
+    <div class="modal">
+      <div class="modal-title">Naloži razred</div>
+      <div class="modal-subtitle">Vnesite geslo za dostop do seznama učencev.</div>
+      <label class="modal-label" for="modalPassword">Geslo</label>
+      <input type="password" class="modal-input" id="modalPassword" placeholder="Vnesite geslo...">
+      <div class="modal-error" id="modalError">Napačno geslo. Poskusite znova.</div>
+      <label class="modal-label" id="classSelectLabel" style="display:none;">Izberite razred</label>
+      <select class="modal-select" id="classSelect">
+        <option value="">-- Izberite razred --</option>
+      </select>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" id="modalCancel">Prekliči</button>
+        <button class="modal-btn modal-btn-confirm" id="modalConfirm">Naloži</button>
       </div>
     </div>
   </div>
@@ -1961,6 +2157,126 @@
 
     window.addEventListener('resize', () => {
       if (fs.active) openFullscreen();
+    });
+
+    // ============================================================================
+    // Load Class Feature (Password Protected)
+    // ============================================================================
+
+    const CLASS_DATA = {
+      "1. A": ["Valter","Matias","Maksimilijan","Julija","Lian","Tim","Gašper","Elias","Filip","Maša","Jaka","Lovro","Anabela","Liam Franci","Amar","Eva","Jure","Žak","Lana","Marja"],
+      "2. A": ["Adrian","Nina","Jan","Amelia","Vito","Ines","Trina","Julija","Lia","Sofia","Maja","Maks","Ajan","Kaja","Enej","Vedad","Ula","Lucjan","Oto","Iva","Rok","Manca","Sofija","Eva","Lina","Brianna Bibi"],
+      "3. A": ["Patrik","Jožef","Lina","Julijana","Tia","Arina","Zala","Daša","Urh","Ema","Mija","Hana","Viktorija","Sara","Lili","Ela","Lana Andrea","Tim","Manca","Luka","Staš","Gal","Enej","Žan"],
+      "3. B": ["Peter","Staš","Anej","Valentina","Januš","Mia","Eva","Vasja Lev","Iza","Marko","Domen","Tulasi","Jara","Ajda","Leonora","Anamari","Talija Pija","Jaka","Tilen","Luka","Zala","Anaja","Tinkara","Manca","Ema","Zoja"],
+      "4. A": ["Nik","Jurij","Tit","Eva","Marina","Jon","Val","Fjolla","Tilen","Amadej","Neža","Taja","Luka","Iris","Zala","Miha"],
+      "4. B": ["Lan","Brin","Vasilija","Zala","Larisa","Eva","Oskar","Nace","Žiga","Jaka","Adonis","Miha","Neli","Aleks","Nik"],
+      "5. A": ["Erisa","Mark","Lucian","Sara","Lara","Nik","Jana","Tinkara","Lukas","Leon","Vanessa","Jal","Anže","Filip","Špela"],
+      "5. B": ["Sofija","Lara","Tisa","Ana","Nikolina","Aljaž","Klement","Neja","Anej","Bohdan","Eva","Jaka","Filip","Daša","Matija","Tjaž","Aya Nina"],
+      "6. A": ["Tai","Lovro","Neja","Alen","Mila","Benjamin","Luka","Lina","Lucija","Matic","Hana","Radenko","Jakob","Dorian","Pia","Živa Klara","Ajda"],
+      "6. B": ["David","Filip","Ariana","Bruce Martin","Neža","Rejana","Jovana","Marko","Nelly","Gal","Val","Izidor","Patrik","Mia","Bor","Neja","Ina"],
+      "7. A": ["Lia","Neja","Maja","Mark","Jure","Nicolina","Oskar","Anej","Jakob Aljaž","Bor","Brina Eva","Anastasia","Kaja","Maj","Elin","Ardinela","Lana"],
+      "7. B": ["Nace","Zoja","Petra","Naja","Ana","Anže","Jan","Klara","Denis","Lara","Tara","Taja","Nina","Andraž","Filip","Janez","Nika","Eva","Svit"],
+      "7. C": ["Tim","Ema","Manca","Sofija","Kristijan","Brina","Pavlina","Tomaž","Denis","Lian","Oskar","Zoja","Ava","Mia","Liza","Anže","Timotej","Valentina","Neža"],
+      "8. A": ["Taja","Enes","Jaša","Maksimiljan","Oto","Hana","Pia","Emanuela","Tian","Karina","Tijaž","Tristan","Gašper","Sara","Vito","Lara","Alina","Luka","Blaž","Urh","Yevhenii","Voranc","Aljaž","David"],
+      "9. A": ["Sara","Lara","Luka","Hana","Jaka","Anej","Tadeja","Ameli","Vid","Ema","Nastja","Anže","Leni","Tilen","Tonija"],
+      "9. B": ["Nik","Anže","Jaka","Matic","Vid","Taj","Špela","Evelin","Ema","Ela","Žan","Urška","Klara Kasiopeja","Hana","Kati","Žiga","Tjaša","Ajša","Larisa","Tiana"]
+    };
+
+    const CLASS_PASSWORD = 'počitnice';
+    let classUnlocked = false;
+
+    const modalElements = {
+      overlay: document.getElementById('classModal'),
+      password: document.getElementById('modalPassword'),
+      error: document.getElementById('modalError'),
+      select: document.getElementById('classSelect'),
+      selectLabel: document.getElementById('classSelectLabel'),
+      confirm: document.getElementById('modalConfirm'),
+      cancel: document.getElementById('modalCancel')
+    };
+
+    // Populate class dropdown
+    Object.keys(CLASS_DATA).forEach(className => {
+      const option = document.createElement('option');
+      option.value = className;
+      option.textContent = `${className} (${CLASS_DATA[className].length} učencev)`;
+      modalElements.select.appendChild(option);
+    });
+
+    function openClassModal() {
+      modalElements.overlay.classList.add('active');
+      modalElements.error.classList.remove('visible');
+      modalElements.password.classList.remove('error');
+
+      if (classUnlocked) {
+        // Already unlocked this session — skip password
+        modalElements.password.style.display = 'none';
+        modalElements.password.previousElementSibling.style.display = 'none'; // hide label
+        modalElements.select.classList.add('visible');
+        modalElements.selectLabel.style.display = 'block';
+        modalElements.confirm.classList.add('visible');
+        modalElements.select.value = '';
+      } else {
+        modalElements.password.style.display = '';
+        modalElements.password.previousElementSibling.style.display = ''; // show label
+        modalElements.password.value = '';
+        modalElements.select.classList.remove('visible');
+        modalElements.selectLabel.style.display = 'none';
+        modalElements.confirm.classList.remove('visible');
+        setTimeout(() => modalElements.password.focus(), 100);
+      }
+    }
+
+    function closeClassModal() {
+      modalElements.overlay.classList.remove('active');
+    }
+
+    function checkPassword() {
+      if (modalElements.password.value === CLASS_PASSWORD) {
+        classUnlocked = true;
+        modalElements.password.style.display = 'none';
+        modalElements.password.previousElementSibling.style.display = 'none';
+        modalElements.error.classList.remove('visible');
+        modalElements.select.classList.add('visible');
+        modalElements.selectLabel.style.display = 'block';
+        modalElements.confirm.classList.add('visible');
+        modalElements.select.value = '';
+        modalElements.select.focus();
+      } else {
+        modalElements.password.classList.add('error');
+        modalElements.error.classList.add('visible');
+        setTimeout(() => modalElements.password.classList.remove('error'), 400);
+      }
+    }
+
+    function loadSelectedClass() {
+      const selected = modalElements.select.value;
+      if (!selected || !CLASS_DATA[selected]) return;
+
+      state.words = [...CLASS_DATA[selected]];
+      state.eliminatedWords = [];
+      elements.resultDiv.textContent = '';
+
+      renderWordList();
+      renderEliminatedList();
+      drawSpinner();
+      elements.spinButton.disabled = false;
+      updateClearAllButton();
+      updateWordCount();
+      updateTabBadges();
+
+      closeClassModal();
+    }
+
+    // Event listeners for modal
+    document.getElementById('loadClassButton').addEventListener('click', openClassModal);
+    modalElements.cancel.addEventListener('click', closeClassModal);
+    modalElements.confirm.addEventListener('click', loadSelectedClass);
+    modalElements.password.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkPassword();
+    });
+    modalElements.overlay.addEventListener('click', (e) => {
+      if (e.target === modalElements.overlay) closeClassModal();
     });
   </script>
 </body>
