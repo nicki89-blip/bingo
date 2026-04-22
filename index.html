@@ -1481,26 +1481,29 @@
       animate();
     }
 
-    function commitPendingElimination() {
-      if (state.pendingEliminationIndex === null) return;
-      const i = state.pendingEliminationIndex;
-      if (i < 0 || i >= state.words.length) {
-        state.pendingEliminationIndex = null;
-        return;
-      }
-      const eliminatedWord = state.words[i];
+    function recordPendingElimination(index) {
+      // Add to eliminated list immediately; slice stays on wheel until next spin
+      state.pendingEliminationIndex = index;
       state.eliminatedWords.push({
-        word: eliminatedWord,
+        word: state.words[index],
         order: state.eliminatedWords.length + 1,
         isFinalWinner: false
       });
-      state.words.splice(i, 1);
+      renderEliminatedList();
+      updateTabBadges();
+    }
+
+    function commitPendingElimination() {
+      if (state.pendingEliminationIndex === null) return;
+      const i = state.pendingEliminationIndex;
+      if (i >= 0 && i < state.words.length) {
+        state.words.splice(i, 1);
+      }
       state.pendingEliminationIndex = null;
       stopPulse();
       elements.resultDiv.textContent = '';
       if (fs.active) fs.result.textContent = '';
       renderWordList();
-      renderEliminatedList();
       updateWordCount();
       updateTabBadges();
     }
@@ -1543,7 +1546,7 @@
       const eliminated = state.words[selectedIndex];
       
       // Mark as pending — slice stays on wheel until next spin
-      state.pendingEliminationIndex = selectedIndex;
+      recordPendingElimination(selectedIndex);
       showElimination(eliminated);
       drawSpinner();
       if (fs.active) drawFsSpinner();
@@ -2157,7 +2160,7 @@
       const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
 
       // Mark as pending — slice stays on wheel until next spin
-      state.pendingEliminationIndex = selectedIndex;
+      recordPendingElimination(selectedIndex);
 
       fs.result.textContent = `${prefix} ${eliminated.toUpperCase()}`;
       elements.resultDiv.textContent = `${prefix} ${eliminated.toUpperCase()}`;
