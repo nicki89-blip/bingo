@@ -1196,7 +1196,9 @@
       isSpinning: false,
       currentRotation: 0,
       soundEnabled: true,
-      audioContext: null
+      audioContext: null,
+      pendingEliminationIndex: null,
+      pulseRaf: null
     };
 
     // Constants
@@ -1352,11 +1354,23 @@
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.lineWidth = 3;
         ctx.stroke();
-        
+
         // Add subtle inner shadow effect
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.lineWidth = 1;
         ctx.stroke();
+
+        // Highlight pending winner slice with pulsing gold glow
+        if (state.pendingEliminationIndex === i) {
+          const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+          ctx.save();
+          ctx.shadowColor = '#fbbf24';
+          ctx.shadowBlur = 20 + pulse * 20;
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 5 + pulse * 4;
+          ctx.stroke();
+          ctx.restore();
+        }
 
         // Draw text
         drawSliceText(i, startAngle, sliceAngle);
@@ -1410,10 +1424,10 @@
     
     function spinWheel() {
       if (state.words.length === 0 || state.isSpinning) return;
-      
-      // Remove previously eliminated word
-      handlePreviousElimination();
-      
+
+      // Commit any pending elimination from the previous spin
+      commitPendingElimination();
+
       if (state.words.length === 0) {
         elements.spinButton.disabled = true;
         return;
@@ -1467,26 +1481,48 @@
       animate();
     }
 
-    function handlePreviousElimination() {
-      const resultText = elements.resultDiv.textContent;
-      if (!resultText) return;
-      
-      const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
-      const previousWinner = resultText.replace(prefix, '').replace('🎉', '').replace('KONČNI ZMAGOVALEC:', '').trim();
-      const winnerIndex = state.words.findIndex(w => w.toUpperCase() === previousWinner);
-      
-      if (winnerIndex !== -1) {
-        const eliminatedWord = state.words[winnerIndex];
-        state.eliminatedWords.push({
-          word: eliminatedWord,
-          order: state.eliminatedWords.length + 1,
-          isFinalWinner: false
-        });
-        state.words.splice(winnerIndex, 1);
-        renderWordList();
-        renderEliminatedList();
-        updateWordCount();
-        updateTabBadges();
+    function commitPendingElimination() {
+      if (state.pendingEliminationIndex === null) return;
+      const i = state.pendingEliminationIndex;
+      if (i < 0 || i >= state.words.length) {
+        state.pendingEliminationIndex = null;
+        return;
+      }
+      const eliminatedWord = state.words[i];
+      state.eliminatedWords.push({
+        word: eliminatedWord,
+        order: state.eliminatedWords.length + 1,
+        isFinalWinner: false
+      });
+      state.words.splice(i, 1);
+      state.pendingEliminationIndex = null;
+      stopPulse();
+      elements.resultDiv.textContent = '';
+      if (fs.active) fs.result.textContent = '';
+      renderWordList();
+      renderEliminatedList();
+      updateWordCount();
+      updateTabBadges();
+    }
+
+    function startPulse() {
+      if (state.pulseRaf !== null) return;
+      const loop = () => {
+        if (state.pendingEliminationIndex === null) {
+          state.pulseRaf = null;
+          return;
+        }
+        drawSpinner();
+        if (fs.active) drawFsSpinner();
+        state.pulseRaf = requestAnimationFrame(loop);
+      };
+      state.pulseRaf = requestAnimationFrame(loop);
+    }
+
+    function stopPulse() {
+      if (state.pulseRaf !== null) {
+        cancelAnimationFrame(state.pulseRaf);
+        state.pulseRaf = null;
       }
     }
 
@@ -1506,63 +1542,57 @@
       const selectedIndex = Math.floor(relativeAngle / sliceAngle) % state.words.length;
       const eliminated = state.words[selectedIndex];
       
+      // Mark as pending — slice stays on wheel until next spin
+      state.pendingEliminationIndex = selectedIndex;
+      showElimination(eliminated);
+      drawSpinner();
+      if (fs.active) drawFsSpinner();
+      startPulse();
+
       if (state.words.length === 2) {
         handleFinalWinner(selectedIndex, eliminated);
-      } else {
-        showElimination(eliminated);
       }
-      
+
       state.isSpinning = false;
-      elements.spinButton.disabled = false;
+      elements.spinButton.disabled = state.words.length < 2;
     }
 
     function handleFinalWinner(selectedIndex, eliminated) {
-      // Add eliminated to list first
-      state.eliminatedWords.push({
-        word: eliminated,
-        order: state.eliminatedWords.length + 1,
-        isFinalWinner: false
-      });
-      
-      state.words.splice(selectedIndex, 1);
-      renderWordList();
-      renderEliminatedList();
-      updateWordCount();
-      updateTabBadges();
+      // Eliminated slice stays highlighted on wheel during the 2s reveal window
+      elements.spinButton.disabled = true;
+      if (fs.active) fs.spinButton.disabled = true;
 
-      const finalWinner = state.words[0];
-      const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
-      
-      // Show elimination first
-      elements.resultDiv.textContent = `${prefix} ${eliminated.toUpperCase()}`;
-      elements.resultDiv.style.fontSize = '28px';
-      elements.resultDiv.style.color = '#dc2626';
-      elements.resultDiv.style.textShadow = 'none';
-      
-      // Then show final winner
       setTimeout(() => {
+        // Commit the elimination now — wheel collapses to the lone finalist
+        commitPendingElimination();
+
+        const finalWinner = state.words[0];
+        if (!finalWinner) return;
+
         elements.resultDiv.textContent = `🎉 KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()} 🎉`;
         elements.resultDiv.style.fontSize = '32px';
         elements.resultDiv.style.color = '#fbbf24';
         elements.resultDiv.style.textShadow = '0 0 20px rgba(251, 191, 36, 0.8)';
-        
-        // Add final winner to eliminated list with special flag
+        if (fs.active) fs.result.textContent = `🎉 KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()} 🎉`;
+
         state.eliminatedWords.push({
           word: finalWinner,
           order: state.eliminatedWords.length + 1,
           isFinalWinner: true
         });
-        
+
         audioSystem.playVictorySound();
         launchFireworks();
-        
+
         state.words = [];
         renderWordList();
         renderEliminatedList();
         updateWordCount();
         updateTabBadges();
         drawSpinner();
+        if (fs.active) drawFsSpinner();
         elements.spinButton.disabled = true;
+        if (fs.active) fs.spinButton.disabled = true;
       }, 2000);
     }
 
@@ -1695,6 +1725,8 @@
     function clearAllWords() {
       state.words = [];
       state.eliminatedWords = [];
+      state.pendingEliminationIndex = null;
+      stopPulse();
       elements.resultDiv.textContent = '';
       renderWordList();
       renderEliminatedList();
@@ -1893,8 +1925,9 @@
 
       // Size the canvas to fit the viewport
       const vh = window.innerHeight;
-      const availableH = vh - 260; // title + button + result + padding
-      fs.canvasSize = Math.min(availableH, window.innerWidth - 340, 600);
+      const availableH = vh - 200; // title + button + result + padding
+      const sidebarReserve = window.innerWidth < 900 ? 220 : 340;
+      fs.canvasSize = Math.min(availableH, window.innerWidth - sidebarReserve, 900);
       fs.canvasSize = Math.max(fs.canvasSize, 280);
 
       fs.canvas.width = fs.canvasSize;
@@ -1971,6 +2004,22 @@
         ctx.lineWidth = 1;
         ctx.stroke();
 
+        // Highlight pending winner slice with pulsing gold glow
+        if (state.pendingEliminationIndex === i) {
+          const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+          ctx.save();
+          ctx.shadowColor = '#fbbf24';
+          ctx.shadowBlur = 25 + pulse * 25;
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 6 + pulse * 5;
+          ctx.beginPath();
+          ctx.moveTo(center, center);
+          ctx.arc(center, center, radius, startAngle, endAngle);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+        }
+
         // Text
         ctx.save();
         ctx.translate(center, center);
@@ -2036,6 +2085,14 @@
     function fsSpinWheel() {
       if (state.words.length === 0 || state.isSpinning) return;
 
+      // Commit any pending elimination from the previous spin
+      commitPendingElimination();
+
+      if (state.words.length === 0) {
+        fs.spinButton.disabled = true;
+        return;
+      }
+
       state.isSpinning = true;
       fs.spinButton.disabled = true;
       elements.spinButton.disabled = true;
@@ -2099,26 +2156,37 @@
       const eliminated = state.words[selectedIndex];
       const prefix = state.config.result_prefix || CONFIG.DEFAULT.result_prefix;
 
-      // Immediately eliminate the selected word
-      state.eliminatedWords.push({ word: eliminated, order: state.eliminatedWords.length + 1, isFinalWinner: false });
-      state.words.splice(selectedIndex, 1);
+      // Mark as pending — slice stays on wheel until next spin
+      state.pendingEliminationIndex = selectedIndex;
 
       fs.result.textContent = `${prefix} ${eliminated.toUpperCase()}`;
-      elements.resultDiv.textContent = '';  // Clear normal view so deferred elimination doesn't double-remove
+      elements.resultDiv.textContent = `${prefix} ${eliminated.toUpperCase()}`;
+      elements.resultDiv.style.fontSize = '28px';
+      elements.resultDiv.style.color = '#dc2626';
+      elements.resultDiv.style.textShadow = 'none';
 
-      fsSyncAll();
+      drawSpinner();
+      drawFsSpinner();
+      startPulse();
 
-      if (state.words.length === 1) {
-        // Crown the final winner
-        const finalWinner = state.words[0];
+      if (state.words.length === 2) {
+        // Final winner sequence: commit after 2s reveal, crown the survivor
         fs.spinButton.disabled = true;
+        elements.spinButton.disabled = true;
 
         setTimeout(() => {
-          state.eliminatedWords.push({ word: finalWinner, order: state.eliminatedWords.length + 1, isFinalWinner: true });
-          state.words = [];
+          commitPendingElimination();
+          const finalWinner = state.words[0];
+          if (!finalWinner) return;
 
           fs.result.textContent = `🎉 KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()} 🎉`;
-          elements.resultDiv.textContent = '';
+          elements.resultDiv.textContent = `🎉 KONČNI ZMAGOVALEC: ${finalWinner.toUpperCase()} 🎉`;
+          elements.resultDiv.style.fontSize = '32px';
+          elements.resultDiv.style.color = '#fbbf24';
+          elements.resultDiv.style.textShadow = '0 0 20px rgba(251, 191, 36, 0.8)';
+
+          state.eliminatedWords.push({ word: finalWinner, order: state.eliminatedWords.length + 1, isFinalWinner: true });
+          state.words = [];
 
           audioSystem.playVictorySound();
           launchFireworks();
@@ -2133,8 +2201,8 @@
       }
 
       state.isSpinning = false;
-      fs.spinButton.disabled = state.words.length === 0;
-      elements.spinButton.disabled = state.words.length === 0;
+      fs.spinButton.disabled = false;
+      elements.spinButton.disabled = false;
     }
 
     function updateFsSoundButton() {
@@ -2255,6 +2323,8 @@
 
       state.words = [...CLASS_DATA[selected]];
       state.eliminatedWords = [];
+      state.pendingEliminationIndex = null;
+      stopPulse();
       elements.resultDiv.textContent = '';
 
       renderWordList();
