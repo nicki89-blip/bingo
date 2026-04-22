@@ -1782,7 +1782,7 @@
         `;
         elements.clearEliminatedButton.disabled = true;
         elements.eliminatedCountDiv.textContent = '0 odstranjenih';
-        if (typeof fs !== 'undefined' && fs.active) renderFsEliminated();
+        if (document.querySelector('#fsOverlay.active')) renderFsEliminated();
         return;
       }
 
@@ -1816,7 +1816,7 @@
         elements.eliminatedContainer.appendChild(eliminatedItem);
       });
 
-      if (typeof fs !== 'undefined' && fs.active) renderFsEliminated();
+      if (document.querySelector('#fsOverlay.active')) renderFsEliminated();
     }
 
     function renderWordList() {
