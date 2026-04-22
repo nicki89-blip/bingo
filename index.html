@@ -1156,7 +1156,7 @@
     <div class="fs-main">
       <button class="fs-close" id="fsClose" title="Zapri">✕</button>
       <button class="fs-sound-toggle" id="fsSoundToggle">🔊</button>
-      <div class="fs-title" id="fsTitle">BINGO</div>
+      <div class="fs-title" id="fsTitle" style="display:none;">BINGO</div>
       <div class="fs-spinner-container" id="fsSpinnerContainer">
         <div class="spinner-pointer">
           <svg viewBox="0 0 48 58" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1955,7 +1955,7 @@
 
       // Size the canvas to fit the viewport
       const vh = window.innerHeight;
-      const availableH = vh - 200; // title + button + result + padding
+      const availableH = vh - 160; // button + result + padding (title hidden)
       const sidebarReserve = window.innerWidth < 900 ? 220 : 340;
       fs.canvasSize = Math.min(availableH, window.innerWidth - sidebarReserve, 900);
       fs.canvasSize = Math.max(fs.canvasSize, 280);
